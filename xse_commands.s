@@ -2012,3 +2012,11 @@ callasm ResetPokeVialUses
 	checkflag \flag
 	if equal _call \destination
 .endm
+
+.macro transparenttxtbox
+	callas TransparentTxtBox
+.endm
+
+.macro cleartransparenttxtbox
+	callas TransparentTxtBoxClear
+.endm

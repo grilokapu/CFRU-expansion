@@ -39,6 +39,7 @@
 #include "../include/constants/songs.h"
 
 #include "../include/gba/m4a_internal.h"
+#include "../include/gba/io_reg.h"
 
 #include "../include/new/battle_strings.h"
 #include "../include/new/build_pokemon.h"
@@ -3366,4 +3367,60 @@ void SetCustomMonIVs(void)
 		const u16 ivValue = (*currIv < 32) ? *currIv : monIv;
 		SetMonData(mon, MON_DATA_HP_IV + i, &ivValue);
     }
+}
+
+extern const u16 TransparentPallete[];
+#define REG_WININ2 *((vu8*)0x04000049)
+#define REG_BLDCNT2 *((vu8*)0x04000051)
+#define REG_BLDALPHA2 *((vu8*)0x04000053)
+void TransparentTxtBox(void)
+{
+    gPaletteFade->bufferTransferDisabled = TRUE;
+
+    CpuFastSet(TransparentPallete, (void*)(BG_PLTT + 0x1E0), CPU_SET_SRC_FIXED | CPU_SET_16BIT | (16 / 2));
+    CpuFastSet(TransparentPallete, (void*)(BG_PLTT + 0x1C0), CPU_SET_SRC_FIXED | CPU_SET_16BIT | (16 / 2));
+
+    REG_WININ = 63;
+    REG_WININ2 = 31;
+    REG_BLDCNT = 65;
+    REG_BLDCNT2 = 63;
+    REG_BLDALPHA = 8;
+    REG_BLDALPHA2 = 8;
+
+    gPlttBufferFaded[484] = 255;
+    gPlttBufferFaded[485] = 255;
+    
+    memset(&gPlttBufferFaded[482], 0, 6); 
+    memset(&gPlttBufferFaded[500], 0, 12);
+}	
+
+void TransparentTxtBoxClear(void)
+{
+    REG_WININ = 0x1F;
+    REG_WININ2 = 0x1F;
+    REG_BLDCNT = 0x40;
+    REG_BLDCNT2 = 0x1E;
+    REG_BLDALPHA = 0x10;
+    REG_BLDALPHA2 = 0x00;
+
+    gPlttBufferFaded[484] = 0x29;
+    gPlttBufferFaded[485] = 0x25;
+    gPlttBufferFaded[482] = 0x5A;
+    gPlttBufferFaded[483] = 0x67;
+    gPlttBufferFaded[486] = 0x1F;
+    gPlttBufferFaded[487] = 0x00;
+    gPlttBufferFaded[500] = 0x9C;
+    gPlttBufferFaded[501] = 0x77;
+    gPlttBufferFaded[502] = 0xFF;
+    gPlttBufferFaded[503] = 0x7E;
+    gPlttBufferFaded[504] = 0x33;
+    gPlttBufferFaded[505] = 0x7F;
+    gPlttBufferFaded[506] = 0xEF;
+    gPlttBufferFaded[507] = 0x72;
+    gPlttBufferFaded[508] = 0xFF;
+    gPlttBufferFaded[509] = 0x7F;
+    gPlttBufferFaded[510] = 0x0E;
+    gPlttBufferFaded[511] = 0x53;
+
+    gPaletteFade->bufferTransferDisabled = FALSE;
 }
